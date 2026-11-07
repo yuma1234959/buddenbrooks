@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Buddenbrooks im Unterricht</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: Kontor-Hauptbuch – ruhige Papierfläche, Kontorgrün als Führungsfarbe, Messing für Hervorhebungen,
+   Ziegelrot nur für das Lösungswort. Fraktur einmalig für den Titel (wie die Erstausgabe 1901). */
+:root{
+  --paper:#edf1ee; --card:#ffffff; --ink:#17211e; --muted:#5a6a64; --line:#cdd8d2;
+  --ledger:#1f4a3c; --ledger-soft:#dbe8e1; --on-ledger:#ffffff;
+  --brass:#a87a22; --brass-soft:#f4ead3; --brick:#9c3b2a; --brick-soft:#f6e1dc;
+  --ok:#2e7d4f; --ok-soft:#dcefe3; --bad:#b3261e;
+  --f-display:"Bodoni Moda", "Didot", Georgia, serif;
+  --f-fraktur:"UnifrakturMaguntia", "Bodoni Moda", Georgia, serif;
+  --f-body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --r:10px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0e1614; --card:#16211d; --ink:#e6ece8; --muted:#94a59e; --line:#2a3a34;
+    --ledger:#77b9a0; --ledger-soft:#1c3129; --on-ledger:#0e1614;
+    --brass:#d9aa4f; --brass-soft:#2c2617; --brick:#e5806a; --brick-soft:#33201c;
+    --ok:#6fcf97; --ok-soft:#173226; --bad:#ff8a80; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0e1614; --card:#16211d; --ink:#e6ece8; --muted:#94a59e; --line:#2a3a34;
+  --ledger:#77b9a0; --ledger-soft:#1c3129; --on-ledger:#0e1614;
+  --brass:#d9aa4f; --brass-soft:#2c2617; --brick:#e5806a; --brick-soft:#33201c;
+  --ok:#6fcf97; --ok-soft:#173226; --bad:#ff8a80; color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 1rem/1.6 var(--f-body);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--ledger)}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;line-height:1.15;text-wrap:balance;margin:0}
+h2{font-size:clamp(1.7rem,4vw,2.4rem)}
+h3{font-size:1.2rem}
+p{margin:0}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.eyebrow{font:600 .75rem/1 var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--brass)}
+
+/* ---------- Kopf & Navigation ---------- */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--ledger);color:var(--on-ledger);box-shadow:0 2px 12px rgb(0 0 0 / .15)}
+.bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:10px}
+.logo{font-family:var(--f-fraktur);font-size:1.9rem;line-height:1;margin-right:auto;color:var(--on-ledger);text-decoration:none}
+nav{display:flex;flex-wrap:wrap;gap:6px}
+.tab{display:inline-flex;align-items:center;gap:7px;border:1px solid transparent;background:transparent;color:var(--on-ledger);
+  padding:8px 12px;border-radius:999px;font-weight:600;font-size:.92rem;opacity:.82;transition:background .2s,opacity .2s}
+.tab svg{width:18px;height:18px;flex:none}
+.tab:hover{opacity:1;background:rgb(255 255 255 / .12)}
+.tab[aria-current="page"]{opacity:1;background:var(--paper);color:var(--ledger)}
+.head-timer{font:600 .95rem var(--f-mono);font-variant-numeric:tabular-nums;display:inline-flex;gap:6px;align-items:center}
+.head-timer svg{width:17px;height:17px}
+.cell:disabled{opacity:1;-webkit-text-fill-color:currentColor}
+.edit-toggle{border:1px dashed currentColor;background:transparent;color:var(--on-ledger);border-radius:999px;padding:7px 12px;font-size:.85rem;font-weight:600;display:inline-flex;gap:6px;align-items:center}
+.edit-toggle[aria-pressed="true"]{background:var(--brass);border-color:var(--brass);color:#fff}
+@media (max-width:760px){
+  .logo{font-size:1.6rem}
+  nav{order:3;width:100%;display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+  .tab{flex-direction:column;gap:3px;padding:7px 2px;font-size:.68rem;border-radius:8px;text-align:center;line-height:1.15}
+}
+
+.edit-banner{background:var(--brass-soft);color:var(--ink);border-bottom:1px solid var(--brass)}
+.edit-banner .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding-block:10px;font-size:.92rem}
+.edit-banner p{flex:1 1 280px;min-width:0}
+
+/* ---------- Titelband mit Treppengiebel ---------- */
+.hero{border-bottom:1px solid var(--line)}
+.hero .wrap{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end;padding-block:28px 0}
+.hero h1{font-family:var(--f-fraktur);font-weight:400;font-size:clamp(2.6rem,8vw,4.6rem);color:var(--ledger)}
+.hero .sub{font-family:var(--f-display);font-style:italic;font-size:clamp(1.05rem,2.4vw,1.35rem);color:var(--muted);margin-top:6px}
+.hero .meta{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 24px}
+.chip{font-size:.8rem;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--ledger-soft);color:var(--ledger)}
+.gable{width:150px;max-width:100%;display:block}
+.gable .house{fill:var(--ledger)} .gable .win{fill:var(--paper)} .gable .lintel{fill:var(--brass)}
+.gable text{fill:var(--paper);font:700 5.4px var(--f-body);letter-spacing:.08em}
+@media (max-width:560px){.hero .wrap{grid-template-columns:1fr}.gable{display:none}}
+
+/* ---------- Seiten ---------- */
+main{padding-block:32px 64px}
+.view{display:none;animation:rise .45s ease both}
+.view.active{display:block}
+@keyframes rise{from{opacity:.4;transform:translateY(8px)}to{opacity:1;transform:none}}
+.view-head{display:grid;gap:8px;margin-bottom:24px;max-width:68ch}
+.lead{color:var(--muted);font-size:1.05rem}
+
+[data-edit]{border-radius:4px;transition:background .2s,outline-color .2s}
+body.editing [data-edit]{outline:1.5px dashed var(--brass);outline-offset:3px;background:var(--brass-soft);cursor:text}
+body.editing [data-edit]:focus{outline-style:solid}
+
+/* Charaktere */
+.cast{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.person{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-content:start;transition:transform .2s,box-shadow .2s}
+.person:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgb(0 0 0 / .08)}
+.mono{grid-row:span 2;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--ledger);color:var(--on-ledger);font:700 1.25rem var(--f-display)}
+.person.rival .mono{background:var(--brick)}
+.person h3{align-self:end;min-width:0}
+.gen{font-size:.75rem;font-weight:600;color:var(--brass);letter-spacing:.06em;text-transform:uppercase}
+.person ul{grid-column:1/-1;margin:10px 0 0;padding-left:1.1em;font-size:.95rem;display:grid;gap:4px}
+.person li::marker{color:var(--brass)}
+
+/* Handlung – Zeitleiste */
+.timeline{list-style:none;margin:0;padding:0;position:relative;display:grid;gap:14px;max-width:760px}
+.timeline::before{content:"";position:absolute;left:68px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.timeline li{display:grid;grid-template-columns:56px 1fr;gap:28px;align-items:start;position:relative}
+.year{font:600 .95rem var(--f-mono);color:var(--ledger);text-align:right;padding-top:14px;font-variant-numeric:tabular-nums}
+.timeline li::after{content:"";position:absolute;left:63px;top:18px;width:12px;height:12px;border-radius:50%;background:var(--paper);border:3px solid var(--brass)}
+.event{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 16px;min-width:0}
+.event h3{font-size:1.05rem;margin-bottom:3px}
+.event p{font-size:.95rem;color:var(--muted)}
+.facts{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:22px}
+.fact{background:var(--ledger-soft);border-radius:var(--r);padding:10px 14px;min-width:0}
+.fact b{display:block;font:700 1.35rem var(--f-display);color:var(--ledger)}
+.fact span{font-size:.85rem;color:var(--muted)}
+
+/* Autor */
+.author{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:24px;align-items:start}
+.portrait{background:var(--ledger);color:var(--on-ledger);border-radius:var(--r);padding:22px;display:grid;gap:16px}
+.portrait .big{font:700 2rem/1.1 var(--f-display)}
+.portrait dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:8px 14px;font-size:.92rem}
+.portrait dt{opacity:.75}
+.portrait dd{margin:0;font-weight:600}
+.author-list{display:grid;gap:12px}
+.note{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;grid-template-columns:36px 1fr;gap:12px;align-items:start}
+.note .ic{width:36px;height:36px;border-radius:8px;background:var(--brass-soft);color:var(--brass);display:grid;place-items:center}
+.note .ic svg{width:20px;height:20px}
+.note div{min-width:0}
+@media (max-width:760px){.author{grid-template-columns:1fr}}
+
+/* Aussage */
+.themes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.theme{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:grid;gap:8px;align-content:start}
+.theme .num{font:700 2.4rem/1 var(--f-display);color:var(--brass)}
+.theme .q{margin-top:6px;font-size:.88rem;font-style:italic;color:var(--ledger);border-top:1px solid var(--line);padding-top:8px}
+.quote{margin-top:22px;background:var(--ledger);color:var(--on-ledger);border-radius:var(--r);padding:22px 24px;font:500 italic clamp(1.1rem,2.6vw,1.4rem)/1.45 var(--f-display);max-width:760px}
+
+/* ---------- Kreuzworträtsel ---------- */
+.puzzle-top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:18px}
+.timer{font:600 1.6rem var(--f-mono);font-variant-numeric:tabular-nums;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:6px 14px;display:inline-flex;gap:10px;align-items:center}
+.timer svg{width:22px;height:22px;color:var(--brass)}
+.btn{border:0;border-radius:999px;padding:10px 18px;font-weight:700;background:var(--ledger);color:var(--on-ledger);transition:transform .15s,filter .15s}
+.btn:hover{filter:brightness(1.08)} .btn:active{transform:scale(.97)}
+.btn.ghost{background:transparent;color:var(--ledger);border:1.5px solid var(--ledger)}
+.btn.warn{background:var(--brick);color:#fff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.start-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:28px;display:grid;gap:14px;justify-items:start;max-width:620px}
+.puzzle{display:grid;grid-template-columns:auto minmax(0,1fr);gap:28px;align-items:start}
+.grid-box{overflow-x:auto;padding-bottom:6px;max-width:100%}
+.grid{--cell:clamp(24px,5.6vw,38px);display:grid;gap:3px;width:max-content}
+.cell{width:var(--cell);height:var(--cell);border:1.5px solid var(--line);border-radius:5px;background:var(--card);color:var(--ink);
+  text-align:center;font:700 calc(var(--cell)*.5) var(--f-body);text-transform:uppercase;padding:0;caret-color:var(--brass)}
+.cell:focus{outline:none;border-color:var(--brass);box-shadow:0 0 0 2px var(--brass)}
+.cell.sol{background:var(--brick-soft);border-color:var(--brick)}
+.cell.row-active{border-color:var(--ledger)}
+.cell.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.cell.sol.ok{background:var(--brick);border-color:var(--brick);color:#fff}
+.cell.wrong{animation:shake .4s;border-color:var(--bad);color:var(--bad)}
+@keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.rownum{width:var(--cell);height:var(--cell);display:grid;place-items:center;font:600 .8rem var(--f-mono);color:var(--muted)}
+.empty{width:var(--cell);height:var(--cell)}
+.clues{list-style:none;margin:0;padding:0;display:grid;gap:6px;min-width:0}
+.clues li{display:grid;grid-template-columns:28px 1fr auto;gap:8px;padding:8px 10px;border-radius:8px;border:1px solid transparent;cursor:pointer;font-size:.95rem}
+.clues li:hover{background:var(--card)}
+.clues li.active{background:var(--card);border-color:var(--ledger)}
+.clues li.done{color:var(--muted)}
+.clues .n{font:600 .85rem var(--f-mono);color:var(--brass);padding-top:2px}
+.clues .len{font:500 .78rem var(--f-mono);color:var(--muted);padding-top:3px}
+.clues li.done .len{color:var(--ok)}
+.solution{margin-top:20px;display:grid;gap:8px}
+.sol-row{display:flex;flex-wrap:wrap;gap:4px}
+.sol-row span{width:32px;height:38px;display:grid;place-items:center;border-radius:5px;border:1.5px dashed var(--brick);font:700 1.1rem var(--f-body);color:var(--brick);background:var(--card)}
+.sol-row span.filled{border-style:solid;background:var(--brick);color:#fff}
+.hint{font-size:.85rem;color:var(--muted)}
+@media (max-width:860px){.puzzle{grid-template-columns:1fr}}
+
+/* ---------- Abschluss ---------- */
+.final-hero{background:var(--ledger);color:var(--on-ledger);border-radius:var(--r);padding:28px;display:grid;gap:10px;position:relative;overflow:hidden}
+.final-hero h2{font-size:clamp(1.8rem,5vw,2.8rem)}
+.final-hero .time{font:600 clamp(2rem,7vw,3.2rem) var(--f-mono);font-variant-numeric:tabular-nums;color:var(--brass)}
+.medal{position:absolute;right:20px;top:18px;width:84px;height:84px;opacity:.9}
+@media (max-width:560px){.medal{width:56px;height:56px}}
+.final-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;margin-top:20px;align-items:start}
+@media (max-width:860px){.final-grid{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:grid;gap:12px;min-width:0}
+.opinion{font-family:var(--f-display);font-size:1.08rem;line-height:1.55;display:grid;gap:10px}
+.verdict{display:inline-block;justify-self:start;font:700 .8rem var(--f-body);letter-spacing:.08em;text-transform:uppercase;padding:5px 12px;border-radius:999px;background:var(--brass-soft);color:var(--brass)}
+.name-form{display:flex;flex-wrap:wrap;gap:8px}
+.name-form input{flex:1 1 180px;min-width:0;border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font:inherit;background:var(--paper);color:var(--ink)}
+.name-form input:focus{outline:none;border-color:var(--brass)}
+.msg{font-size:.88rem;color:var(--ok);min-height:1.3em}
+.board-box{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th{text-align:left;font:600 .72rem var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:9px 8px;border-bottom:1px solid var(--line)}
+td.t{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+th.t{text-align:right}
+td.rank{font:700 1rem var(--f-display);width:44px}
+tr.me td{background:var(--brass-soft)}
+tr:nth-child(1) td.rank{color:var(--brass)}
+.empty-board{color:var(--muted);font-size:.92rem;padding:10px 0}
+
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:.85rem}
+footer .wrap{padding-block:18px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ============ KOPFZEILE MIT NAVIGATION ============ -->
+<header>
+  <div class="wrap bar">
+    <a class="logo" href="#charaktere" data-go="charaktere">Buddenbrooks</a>
+    <nav aria-label="Hauptmenü">
+      <button class="tab" data-go="charaktere"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><circle cx="17" cy="7" r="2.5"/><path d="M17 12.5c2.4 0 4 1.4 4.6 4"/></svg>Wichtige Charaktere</button>
+      <button class="tab" data-go="handlung"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4.5h6a2 2 0 0 1 2 2V20a2 2 0 0 0-2-2H4z"/><path d="M20 4.5h-6a2 2 0 0 0-2 2V20a2 2 0 0 1 2-2h6z"/></svg>Handlung</button>
+      <button class="tab" data-go="autor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 3l5 5L9 20H4v-5z"/><path d="M13.5 5.5l5 5"/></svg>Über den Autor</button>
+      <button class="tab" data-go="aussage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>Aussage des Buches</button>
+      <button class="tab" data-go="raetsel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/><rect x="15" y="9" width="6" height="6" rx="1"/><rect x="9" y="15" width="6" height="6" rx="1"/></svg>Kreuzworträtsel</button>
+    </nav>
+    <span class="head-timer" title="Zeit seit dem Öffnen der Website"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><span id="headTimer">0:00</span></span>
+    <button class="edit-toggle" id="editToggle" aria-pressed="false" title="Texte bearbeiten">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 3l5 5L9 20H4v-5z"/></svg>Bearbeiten</button>
+  </div>
+</header>
+
+<!-- Hinweisleiste im Bearbeitungsmodus -->
+<div class="edit-banner" id="editBanner" hidden>
+  <div class="wrap">
+    <p><b>Bearbeitungsmodus:</b> Gelb markierte Texte anklicken und ändern. Änderungen werden automatisch in diesem Browser gespeichert.</p>
+    <button class="btn ghost" id="resetTexts">Alle Texte zurücksetzen</button>
+    <button class="btn" id="editDone">Fertig</button>
+  </div>
+</div>
+
+<!-- ============ TITELBAND ============ -->
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow" data-edit="hero-eyebrow">Deutschunterricht · Klasse 11</p>
+      <h1>Buddenbrooks</h1>
+      <p class="sub" data-edit="hero-sub">Verfall einer Familie – Roman von Thomas Mann (1901)</p>
+      <div class="meta">
+        <span class="chip">4 Generationen</span><span class="chip">Lübeck 1835–1877</span><span class="chip">Nobelpreis 1929</span>
+      </div>
+    </div>
+    <!-- Lübecker Treppengiebel mit dem Hausspruch über der Tür der Mengstraße 4 -->
+    <svg class="gable" viewBox="0 0 100 120" aria-hidden="true">
+      <path class="house" d="M10 120V52h8V42h8V32h8V22h8V12h16v10h8v10h8v10h8v10h8v68z"/>
+      <rect class="win" x="44" y="18" width="12" height="10" rx="1"/>
+      <rect class="win" x="24" y="48" width="12" height="14" rx="1"/><rect class="win" x="44" y="48" width="12" height="14" rx="1"/><rect class="win" x="64" y="48" width="12" height="14" rx="1"/>
+      <rect class="win" x="24" y="70" width="12" height="14" rx="1"/><rect class="win" x="64" y="70" width="12" height="14" rx="1"/>
+      <rect class="lintel" x="18" y="89" width="64" height="9" rx="1"/>
+      <text x="50" y="95.6" text-anchor="middle">DOMINUS PROVIDEBIT</text>
+      <rect class="win" x="42" y="100" width="16" height="20" rx="8"/>
+    </svg>
+  </div>
+</section>
+
+<main class="wrap">
+
+<!-- ============ 1. WICHTIGE CHARAKTERE ============ -->
+<section class="view" id="v-charaktere" aria-labelledby="h-char">
+  <div class="view-head">
+    <p class="eyebrow">Seite 1</p>
+    <h2 id="h-char" data-edit="char-title">Wichtige Charaktere</h2>
+    <p class="lead" data-edit="char-lead">Die Kaufmannsfamilie Buddenbrook aus Lübeck – und ihre Konkurrenz.</p>
+  </div>
+  <div class="cast">
+    <article class="person"><div class="mono">J</div><span class="gen">2. Generation</span><h3 data-edit="p1-name">Konsul Jean Buddenbrook</h3>
+      <ul data-edit="p1-text"><li>Johann „Jean“ Buddenbrook, Chef der Getreidefirma</li><li>Sehr fromm und pflichtbewusst</li><li>Vater von Thomas, Christian, Tony und Clara</li></ul></article>
+    <article class="person"><div class="mono">T</div><span class="gen">3. Generation</span><h3 data-edit="p2-name">Thomas Buddenbrook</h3>
+      <ul data-edit="p2-text"><li>Ältester Sohn, übernimmt die Firma</li><li>Wird <b>Senator</b> in Lübeck</li><li>Wirkt nach außen stark, ist innerlich erschöpft</li></ul></article>
+    <article class="person"><div class="mono">A</div><span class="gen">3. Generation</span><h3 data-edit="p3-name">Antonie „Tony“ Buddenbrook</h3>
+      <ul data-edit="p3-text"><li>Spitzname: <b>Tony</b>; lebensfroh, stolz auf die Familie</li><li>1. Ehe mit <b>Bendix</b> Grünlich – einem Betrüger, der Bankrott macht</li><li>2. Ehe mit Alois <b>Permaneder</b> aus München – scheitert ebenfalls</li></ul></article>
+    <article class="person"><div class="mono">C</div><span class="gen">3. Generation</span><h3 data-edit="p4-name">Christian Buddenbrook</h3>
+      <ul data-edit="p4-text"><li>Jüngerer Bruder von Thomas</li><li>Lebemann und Hypochonder, liebt das Theater</li><li>Scheitert im Beruf, endet in einer Anstalt</li></ul></article>
+    <article class="person"><div class="mono">G</div><span class="gen">3. Generation</span><h3 data-edit="p5-name">Gerda Arnoldsen</h3>
+      <ul data-edit="p5-text"><li>Ehefrau von Thomas, kommt aus Amsterdam</li><li>Spielt Geige und liebt die Musik (Wagner)</li><li>Bleibt der Familie fremd</li></ul></article>
+    <article class="person"><div class="mono">H</div><span class="gen">4. Generation</span><h3 data-edit="p6-name">Hanno Buddenbrook</h3>
+      <ul data-edit="p6-text"><li>Sohn von Thomas und Gerda – letzter männlicher Buddenbrook</li><li>Sensibel, kränklich, sehr musikalisch</li><li>Stirbt als Jugendlicher an <b>Typhus</b></li></ul></article>
+    <article class="person rival"><div class="mono">H</div><span class="gen">Gegenspieler</span><h3 data-edit="p7-name">Familie Hagenström</h3>
+      <ul data-edit="p7-text"><li>Konkurrierende Kaufmannsfamilie</li><li>Steigt auf, während die Buddenbrooks absteigen</li><li>Kauft am Ende das Buddenbrook-Haus</li></ul></article>
+  </div>
+</section>
+
+<!-- ============ 2. HANDLUNG ============ -->
+<section class="view" id="v-handlung" aria-labelledby="h-hand">
+  <div class="view-head">
+    <p class="eyebrow">Seite 2</p>
+    <h2 id="h-hand" data-edit="plot-title">Handlung</h2>
+    <p class="lead" data-edit="plot-lead">Der Roman erzählt über 42 Jahre, wie eine reiche Familie Schritt für Schritt ihren Halt verliert.</p>
+  </div>
+  <div class="facts">
+    <div class="fact"><b data-edit="f1-b">4</b><span data-edit="f1-s">Generationen</span></div>
+    <div class="fact"><b data-edit="f2-b">11</b><span data-edit="f2-s">Teile im Roman</span></div>
+    <div class="fact"><b data-edit="f3-b">Lübeck</b><span data-edit="f3-s">Hansestadt, Schauplatz</span></div>
+  </div>
+  <ol class="timeline">
+    <li><span class="year">1835</span><div class="event"><h3 data-edit="t1-h">Fest im neuen Haus</h3><p data-edit="t1-p">Die Familie feiert den Einzug in das prächtige Haus in der Mengstraße. Die Firma ist erfolgreich.</p></div></li>
+    <li><span class="year">1845</span><div class="event"><h3 data-edit="t2-h">Tonys erste Ehe</h3><p data-edit="t2-p">Tony heiratet aus Pflichtgefühl Bendix Grünlich. Er ist ein Betrüger und geht bankrott – die Ehe wird geschieden.</p></div></li>
+    <li><span class="year">1855</span><div class="event"><h3 data-edit="t3-h">Thomas wird Chef</h3><p data-edit="t3-p">Nach dem Tod des Konsuls übernimmt Thomas die Firma und heiratet Gerda Arnoldsen.</p></div></li>
+    <li><span class="year">1861</span><div class="event"><h3 data-edit="t4-h">Höhepunkt</h3><p data-edit="t4-p">Hanno wird geboren. Thomas wird Senator und baut ein neues Haus. Doch Tonys zweite Ehe mit Permaneder scheitert.</p></div></li>
+    <li><span class="year">1868</span><div class="event"><h3 data-edit="t5-h">Geschäftlicher Abstieg</h3><p data-edit="t5-p">Fehlentscheidungen und Verluste schwächen die Firma, die Hagenströms überholen die Buddenbrooks.</p></div></li>
+    <li><span class="year">1875</span><div class="event"><h3 data-edit="t6-h">Tod von Thomas</h3><p data-edit="t6-p">Thomas bricht nach einem Zahnarztbesuch auf der Straße zusammen und stirbt. Die Firma wird aufgelöst, das Haus verkauft.</p></div></li>
+    <li><span class="year">1877</span><div class="event"><h3 data-edit="t7-h">Das Ende der Familie</h3><p data-edit="t7-p">Hanno stirbt mit 16 Jahren an Typhus. Mit ihm endet die männliche Linie der Buddenbrooks.</p></div></li>
+  </ol>
+</section>
+
+<!-- ============ 3. ÜBER DEN AUTOR ============ -->
+<section class="view" id="v-autor" aria-labelledby="h-aut">
+  <div class="view-head">
+    <p class="eyebrow">Seite 3</p>
+    <h2 id="h-aut" data-edit="aut-title">Über den Autor</h2>
+    <p class="lead" data-edit="aut-lead">Thomas Mann schrieb über eine Welt, die er selbst gut kannte.</p>
+  </div>
+  <div class="author">
+    <div class="portrait">
+      <p class="big">Thomas Mann</p>
+      <dl>
+        <dt>Geboren</dt><dd data-edit="a-born">6. Juni 1875 in Lübeck</dd>
+        <dt>Gestorben</dt><dd data-edit="a-died">12. August 1955 in Zürich</dd>
+        <dt>Familie</dt><dd data-edit="a-fam">Sohn eines Kaufmanns und Senators</dd>
+        <dt>Bruder</dt><dd data-edit="a-bro">Heinrich Mann, ebenfalls Schriftsteller</dd>
+        <dt>Preis</dt><dd data-edit="a-prize">Nobelpreis für Literatur 1929</dd>
+      </dl>
+    </div>
+    <div class="author-list">
+      <div class="note"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4.5h6a2 2 0 0 1 2 2V20a2 2 0 0 0-2-2H4z"/><path d="M20 4.5h-6a2 2 0 0 0-2 2V20a2 2 0 0 1 2-2h6z"/></svg></span>
+        <div><h3 data-edit="n1-h">Erster Roman</h3><p data-edit="n1-p">„Buddenbrooks“ erschien 1901. Mann war erst 25 Jahre alt. Vorbild war seine eigene Lübecker Familie.</p></div></div>
+      <div class="note"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M8.5 14l-1.5 7 5-3 5 3-1.5-7"/></svg></span>
+        <div><h3 data-edit="n2-h">Nobelpreis 1929</h3><p data-edit="n2-p">Mann erhielt den Nobelpreis für Literatur – die Schwedische Akademie nannte vor allem „Buddenbrooks“.</p></div></div>
+      <div class="note"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h14M13 7l5 5-5 5"/><path d="M21 4v16"/></svg></span>
+        <div><h3 data-edit="n3-h">Exil</h3><p data-edit="n3-p">Als Gegner der Nationalsozialisten lebte er ab 1933 im Exil: zuerst in der Schweiz, später in den USA.</p></div></div>
+      <div class="note"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 4h14v16H5z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span>
+        <div><h3 data-edit="n4-h">Weitere Werke</h3><p data-edit="n4-p">Der Tod in Venedig (1912), Der Zauberberg (1924), Doktor Faustus (1947).</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. AUSSAGE DES BUCHES ============ -->
+<section class="view" id="v-aussage" aria-labelledby="h-aus">
+  <div class="view-head">
+    <p class="eyebrow">Seite 4</p>
+    <h2 id="h-aus" data-edit="aus-title">Aussage des Buches</h2>
+    <p class="lead" data-edit="aus-lead">Worum geht es eigentlich? Vier zentrale Themen.</p>
+  </div>
+  <div class="themes">
+    <article class="theme"><span class="num">I</span><h3 data-edit="th1-h">Verfall einer Familie</h3>
+      <p data-edit="th1-p">So lautet der Untertitel. Von Generation zu Generation verlieren die Buddenbrooks Geld, Gesundheit und Lebenswillen.</p>
+      <p class="q" data-edit="th1-q">Woran merkt man den Verfall bei Hanno?</p></article>
+    <article class="theme"><span class="num">II</span><h3 data-edit="th2-h">Bürger gegen Künstler</h3>
+      <p data-edit="th2-p">Je mehr Sinn für Kunst und Musik die Figuren haben, desto weniger taugen sie fürs Geschäft (Gerda, Hanno, Christian).</p>
+      <p class="q" data-edit="th2-q">Passen Kunst und Kaufmannsleben zusammen?</p></article>
+    <article class="theme"><span class="num">III</span><h3 data-edit="th3-h">Pflicht und Fassade</h3>
+      <p data-edit="th3-p">Thomas spielt nach außen den perfekten Senator. Innerlich ist er leer und müde – die Fassade kostet ihn alle Kraft.</p>
+      <p class="q" data-edit="th3-q">Was opfern die Figuren für den Ruf der Familie?</p></article>
+    <article class="theme"><span class="num">IV</span><h3 data-edit="th4-h">Neue Zeit</h3>
+      <p data-edit="th4-p">Die alte Kaufmannswelt geht unter. Moderne, rücksichtslose Familien wie die Hagenströms übernehmen.</p>
+      <p class="q" data-edit="th4-q">Wer gewinnt am Ende – und warum?</p></article>
+  </div>
+  <blockquote class="quote" data-edit="aus-quote">Kernaussage: Erfolg und Tradition schützen nicht vor dem Niedergang – oft beginnt der Verfall gerade auf dem Höhepunkt.</blockquote>
+</section>
+
+<!-- ============ 5. KREUZWORTRÄTSEL ============ -->
+<section class="view" id="v-raetsel" aria-labelledby="h-kr">
+  <div class="view-head">
+    <p class="eyebrow">Seite 5</p>
+    <h2 id="h-kr" data-edit="kr-title">Kreuzworträtsel</h2>
+    <p class="lead" data-edit="kr-lead">Alle Antworten findest du auf den vorherigen Seiten. Die roten Felder ergeben das Lösungswort. Die Zeit läuft seit dem Öffnen der Website und lässt sich nicht zurücksetzen!</p>
+  </div>
+
+  <!-- Rätselbereich -->
+  <div id="puzzleArea">
+    <div class="puzzle-top">
+      <span class="timer" aria-live="off"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><span id="timer">0:00,0</span></span>
+      <button class="btn ghost" id="checkBtn">Fehler zeigen</button>
+    </div>
+    <div class="puzzle">
+      <div>
+        <div class="grid-box"><div class="grid" id="grid"></div></div>
+        <div class="solution">
+          <span class="eyebrow">Lösungswort</span>
+          <div class="sol-row" id="solRow"></div>
+          <p class="hint">Das Rätsel ist gelöst, wenn alle Wörter richtig sind.</p>
+        </div>
+      </div>
+      <ol class="clues" id="clues"></ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ABSCHLUSSSEITE (erscheint nach der Lösung) ============ -->
+<section class="view" id="v-abschluss" aria-labelledby="h-fin">
+  <div class="final-hero">
+    <svg class="medal" viewBox="0 0 64 64" aria-hidden="true"><path d="M22 2h8l6 16h-8zM42 2h-8l-6 16h8z" fill="currentColor" opacity=".55"/><circle cx="32" cy="40" r="20" fill="var(--brass)"/><circle cx="32" cy="40" r="14" fill="none" stroke="var(--on-ledger)" stroke-width="2" opacity=".6"/><text x="32" y="46" text-anchor="middle" font-family="Bodoni Moda, Georgia, serif" font-weight="700" font-size="16" fill="var(--on-ledger)">1929</text></svg>
+    <p class="eyebrow" style="color:var(--brass)">Gelöst!</p>
+    <h2 id="h-fin">NOBELPREIS</h2>
+    <p>Deine Zeit:</p>
+    <p class="time" id="finalTime">–</p>
+  </div>
+
+  <div class="final-grid">
+    <div class="panel">
+      <span class="eyebrow">Meine Meinung</span>
+      <h3 data-edit="op-h">Hat „Buddenbrooks“ den Nobelpreis verdient?</h3>
+      <span class="verdict" data-edit="op-verdict">Mein Urteil: Ja!</span>
+      <div class="opinion" data-edit="op-text">
+        <p>Hier steht meine Meinung. Klicke oben auf „Bearbeiten“, um diesen Text zu ersetzen.</p>
+        <p>Beispiel: Für mich ja. Mann zeigt an einer einzigen Familie, wie eine ganze Gesellschaft sich verändert. Die Figuren sind so genau beobachtet, dass man sie noch heute wiedererkennt – und das schrieb er mit 25 Jahren.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <span class="eyebrow">Bestenliste</span>
+      <form class="name-form" id="nameForm">
+        <label for="studentName" class="hint" style="flex-basis:100%">Trage deinen Namen ein:</label>
+        <input id="studentName" maxlength="30" autocomplete="off" placeholder="Dein Name">
+        <button class="btn" id="saveBtn" type="submit">Speichern</button>
+      </form>
+      <p class="msg" id="saveMsg" aria-live="polite"></p>
+      <div class="board-box">
+        <table>
+          <thead><tr><th>#</th><th>Name</th><th class="t">Zeit</th></tr></thead>
+          <tbody id="board"></tbody>
+        </table>
+        <p class="empty-board" id="emptyBoard">Noch keine Einträge. Sei die oder der Erste!</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn ghost" id="clearBoard">Bestenliste löschen</button>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap" data-edit="footer">Präsentation zu Thomas Mann: „Buddenbrooks. Verfall einer Familie“ (1901)</div></footer>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script>
+/* =====================================================================
+   RÄTSELDATEN – hier lassen sich Fragen und Antworten ändern.
+   a = Antwort (nur A–Z, Umlaute als AE/OE/UE), q = Frage,
+   k = Position (ab 0) des Buchstabens, der zum Lösungswort gehört.
+   ===================================================================== */
+const SOLUTION = "NOBELPREIS";
+const PUZZLE = [
+  { a:"HANNO",      k:2, q:"Wie heißt der letzte männliche Buddenbrook, Sohn von Thomas und Gerda?" },
+  { a:"TONY",       k:1, q:"Spitzname von Antonie Buddenbrook" },
+  { a:"BENDIX",     k:0, q:"Vorname von Tonys erstem Ehemann Grünlich" },
+  { a:"SENATOR",    k:1, q:"Welches Amt erreicht Thomas Buddenbrook in Lübeck?" },
+  { a:"VERFALL",    k:5, q:"Untertitel des Romans: „… einer Familie“" },
+  { a:"PERMANEDER", k:0, q:"Nachname von Tonys zweitem Ehemann aus München" },
+  { a:"GERDA",      k:2, q:"Vorname von Thomas’ musikalischer Ehefrau aus Amsterdam" },
+  { a:"EXIL",       k:0, q:"Wo lebte Thomas Mann ab 1933? Im …" },
+  { a:"CHRISTIAN",  k:3, q:"Thomas’ jüngerer Bruder, Lebemann und Hypochonder" },
+  { a:"TYPHUS",     k:5, q:"An welcher Krankheit stirbt Hanno?" }
+];
+
+/* ---------- Speicher-Helfer (localStorage kann blockiert sein) ---------- */
+const store = {
+  get(k, fb){ try{ const v = localStorage.getItem(k); return v === null ? fb : JSON.parse(v); }catch(e){ return fb; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+
+/* ---------- Navigation zwischen den Seiten ---------- */
+const VIEWS = ["charaktere","handlung","autor","aussage","raetsel","abschluss"];
+function show(view){
+  if(!VIEWS.includes(view)) view = "charaktere";
+  $$(".view").forEach(v => v.classList.toggle("active", v.id === "v-" + view));
+  $$(".tab").forEach(t => t.setAttribute("aria-current", t.dataset.go === view ? "page" : "false"));
+  $(".hero").hidden = (view === "raetsel" || view === "abschluss");
+  try{ history.replaceState(null, "", "#" + view); }catch(e){}
+  if(view === "abschluss"){ renderBoard(); formState(); }
+  window.scrollTo({ top: 0 });
+}
+$$("[data-go]").forEach(b => b.addEventListener("click", e => { e.preventDefault(); show(b.dataset.go); }));
+
+/* ---------- Bearbeitbare Platzhalter ---------- */
+const EDIT_KEY = "bb-texts";
+const defaults = {};
+let saved = store.get(EDIT_KEY, {});
+$$("[data-edit]").forEach(el => {
+  defaults[el.dataset.edit] = el.innerHTML;                 // Original merken
+  if(saved[el.dataset.edit] != null) el.innerHTML = saved[el.dataset.edit];
+  el.addEventListener("input", () => { saved[el.dataset.edit] = el.innerHTML; store.set(EDIT_KEY, saved); });
+});
+function setEditing(on){
+  document.body.classList.toggle("editing", on);
+  $("#editToggle").setAttribute("aria-pressed", on);
+  $("#editBanner").hidden = !on;
+  $$("[data-edit]").forEach(el => on ? el.setAttribute("contenteditable","true") : el.removeAttribute("contenteditable"));
+}
+$("#editToggle").addEventListener("click", () => setEditing(!document.body.classList.contains("editing")));
+$("#editDone").addEventListener("click", () => setEditing(false));
+twoStep($("#resetTexts"), "Wirklich alles zurücksetzen?", () => {
+  saved = {}; store.del(EDIT_KEY);
+  $$("[data-edit]").forEach(el => el.innerHTML = defaults[el.dataset.edit]);
+});
+
+/* Bestätigung direkt im Button (Dialogfenster sind nicht überall erlaubt) */
+function twoStep(btn, question, action){
+  const label = btn.textContent; let armed = false, t;
+  btn.addEventListener("click", () => {
+    if(!armed){ armed = true; btn.textContent = question; btn.classList.add("warn");
+      t = setTimeout(() => { armed = false; btn.textContent = label; btn.classList.remove("warn"); }, 3500); return; }
+    clearTimeout(t); armed = false; btn.textContent = label; btn.classList.remove("warn"); action();
+  });
+}
+
+/* ---------- Kreuzworträtsel aufbauen ---------- */
+const solCol = Math.max(...PUZZLE.map(p => p.k));
+const width  = Math.max(...PUZZLE.map(p => solCol - p.k + p.a.length));
+const grid = $("#grid");
+grid.style.gridTemplateColumns = `repeat(${width + 1}, var(--cell))`;
+const cells = [];   // cells[r][i] = Eingabefeld
+
+PUZZLE.forEach((p, r) => {
+  const off = solCol - p.k;
+  const num = document.createElement("div"); num.className = "rownum"; num.textContent = r + 1; grid.append(num);
+  cells[r] = [];
+  for(let c = 0; c < width; c++){
+    const i = c - off;
+    if(i < 0 || i >= p.a.length){ const e = document.createElement("div"); e.className = "empty"; grid.append(e); continue; }
+    const inp = document.createElement("input");
+    inp.className = "cell" + (i === p.k ? " sol" : "");
+    inp.maxLength = 1; inp.autocomplete = "off"; inp.spellcheck = false;
+    inp.setAttribute("autocapitalize", "characters");
+    inp.setAttribute("aria-label", `Frage ${r+1}, Buchstabe ${i+1}`);
+    inp.id = `c-${r}-${i}`;
+    inp.dataset.r = r; inp.dataset.i = i; inp.dataset.col = c;
+    grid.append(inp); cells[r][i] = inp;
+  }
+});
+
+// Fragenliste
+PUZZLE.forEach((p, r) => {
+  const li = document.createElement("li");
+  li.innerHTML = `<span class="n">${r+1}</span><span></span><span class="len">${p.a.length}</span>`;
+  li.children[1].textContent = p.q;
+  li.addEventListener("click", () => { const c = cells[r].find(x => !x.value) || cells[r][0]; c.focus(); });
+  $("#clues").append(li);
+});
+// Lösungswort-Leiste
+for(let i = 0; i < SOLUTION.length; i++){ $("#solRow").append(document.createElement("span")); }
+
+/* Tastatur-Steuerung */
+grid.addEventListener("input", e => {
+  const inp = e.target; if(!inp.classList.contains("cell")) return;
+  const ch = inp.value.toUpperCase().replace(/[^A-ZÄÖÜ]/g, "").slice(-1);
+  inp.value = ch; inp.classList.remove("wrong");
+  if(ch){ const r = +inp.dataset.r, i = +inp.dataset.i; (cells[r][i+1] || inp).focus(); }
+  evaluate();
+});
+grid.addEventListener("keydown", e => {
+  const inp = e.target; if(!inp.classList.contains("cell")) return;
+  const r = +inp.dataset.r, i = +inp.dataset.i;
+  if(e.key === "Backspace" && !inp.value && cells[r][i-1]){ e.preventDefault(); cells[r][i-1].value = ""; cells[r][i-1].focus(); evaluate(); }
+  else if(e.key === "ArrowLeft"  && cells[r][i-1]){ e.preventDefault(); cells[r][i-1].focus(); }
+  else if(e.key === "ArrowRight" && cells[r][i+1]){ e.preventDefault(); cells[r][i+1].focus(); }
+  else if(e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "Enter"){
+    e.preventDefault();
+    const dir = e.key === "ArrowUp" ? -1 : 1, col = +inp.dataset.col;
+    for(let rr = r + dir; rr >= 0 && rr < PUZZLE.length; rr += dir){
+      const t = cells[rr].find(x => x && +x.dataset.col === col) || (e.key === "Enter" ? cells[rr][0] : null);
+      if(t){ t.focus(); break; }
+    }
+  }
+});
+grid.addEventListener("focusin", e => {
+  if(!e.target.classList.contains("cell")) return;
+  const r = +e.target.dataset.r;
+  $$(".cell").forEach(c => c.classList.toggle("row-active", +c.dataset.r === r));
+  $$("#clues li").forEach((li, k) => li.classList.toggle("active", k === r));
+  e.target.select();
+});
+
+/* Prüfen: richtige Zeilen grün, Lösungswort-Leiste füllen, bei Vollständigkeit Abschluss */
+function evaluate(){
+  let all = true;
+  PUZZLE.forEach((p, r) => {
+    const word = cells[r].map(c => c.value).join("");
+    const ok = word === p.a;
+    cells[r].forEach(c => c.classList.toggle("ok", ok));
+    $("#clues").children[r].classList.toggle("done", ok);
+    if(!ok) all = false;
+    const s = $("#solRow").children[r], v = cells[r][p.k].value;
+    s.textContent = v; s.classList.toggle("filled", !!v);
+  });
+  if(all && running) solved();
+}
+$("#checkBtn").addEventListener("click", () => {
+  PUZZLE.forEach((p, r) => cells[r].forEach((c, i) => {
+    if(c.value && c.value !== p.a[i]){ c.classList.remove("wrong"); void c.offsetWidth; c.classList.add("wrong"); }
+  }));
+});
+
+/* ---------- Zeitmessung ----------
+   Die Uhr startet beim ersten Öffnen der Website. Die Startzeit wird im Browser
+   gespeichert, damit Neuladen sie nicht zurücksetzt. Es gibt keinen Neustart-Knopf. */
+const START_KEY = "bb-start", SOLVED_KEY = "bb-solved";
+let t0 = store.get(START_KEY, null);
+if(typeof t0 !== "number" || t0 > Date.now()){ t0 = Date.now(); store.set(START_KEY, t0); }
+let solvedState = store.get(SOLVED_KEY, null);          // { ms, saved } nach der Lösung
+let running = !solvedState, lastTime = solvedState ? solvedState.ms : null, timerId = null;
+const fmt = ms => { const s = ms / 1000, m = Math.floor(s / 60); return `${m}:${String(Math.floor(s % 60)).padStart(2,"0")},${Math.floor((ms % 1000) / 100)}`; };
+function showTime(ms){ $("#timer").textContent = fmt(ms); $("#headTimer").textContent = fmt(ms).split(",")[0]; }
+function lockGrid(){ PUZZLE.forEach((p, r) => cells[r].forEach((c, i) => { c.value = p.a[i]; c.disabled = true; })); }
+if(running){
+  showTime(Date.now() - t0);
+  timerId = setInterval(() => showTime(Date.now() - t0), 100);
+}else{                                                   // schon gelöst: Zeit bleibt stehen
+  showTime(lastTime); $("#finalTime").textContent = fmt(lastTime);
+  lockGrid(); evaluate();
+}
+/* Wer schon eingetragen ist, kann sich nicht ein zweites Mal eintragen */
+function formState(){
+  if(solvedState && solvedState.saved){
+    $("#saveBtn").disabled = true; $("#studentName").disabled = true;
+    $("#saveMsg").textContent = "Du bist schon in der Bestenliste eingetragen.";
+  }
+}
+
+function solved(){
+  running = false; clearInterval(timerId);
+  lastTime = Date.now() - t0;
+  solvedState = { ms: lastTime, saved: false }; store.set(SOLVED_KEY, solvedState);
+  showTime(lastTime); cells.flat().forEach(c => c.disabled = true);
+  $("#finalTime").textContent = fmt(lastTime);
+  $("#saveBtn").disabled = false; $("#studentName").disabled = false; $("#saveMsg").textContent = "";
+  confetti();
+  setTimeout(() => { show("abschluss"); $("#studentName").focus(); }, 1400);
+}
+
+/* =====================================================================
+   GEMEINSAME BESTENLISTE (Supabase)
+   Trage hier die Daten aus deinem Supabase-Projekt ein
+   (Project Settings → API). Bleiben die Felder leer, wird die
+   Bestenliste nur lokal im Browser gespeichert.
+   ===================================================================== */
+const SUPABASE_URL = "";   // z. B. "https://abcdefgh.supabase.co"
+const SUPABASE_KEY = "";   // "anon"- bzw. "publishable"-Schlüssel (öffentlich, darf in die Datei)
+const TABLE = "bestenliste";
+const ONLINE = !!(SUPABASE_URL && SUPABASE_KEY);
+
+// Kopfzeilen für die Supabase-REST-Schnittstelle
+function sbHeaders(extra){
+  const h = { apikey: SUPABASE_KEY, "Content-Type": "application/json", ...extra };
+  if(!SUPABASE_KEY.startsWith("sb_")) h.Authorization = "Bearer " + SUPABASE_KEY;  // alter anon-Schlüssel (JWT)
+  return h;
+}
+const sbBase = () => SUPABASE_URL.replace(/\/$/, "") + "/rest/v1/" + TABLE;
+
+/* Daten laden: online aus Supabase, sonst aus localStorage */
+const BOARD_KEY = "bb-leaderboard";
+async function fetchBoard(){
+  if(!ONLINE) return store.get(BOARD_KEY, []).sort((a, b) => a.ms - b.ms).slice(0, 20);
+  const res = await fetch(sbBase() + "?select=id,name,ms&order=ms.asc&limit=20", { headers: sbHeaders() });
+  if(!res.ok) throw new Error(res.status);
+  return res.json();
+}
+/* Eintrag speichern, gibt { id, rank } zurück */
+async function addEntry(name, ms){
+  if(!ONLINE){
+    const list = store.get(BOARD_KEY, []);
+    const id = Date.now() + "-" + Math.random().toString(36).slice(2, 6);
+    list.push({ id, name, ms, date: new Date().toISOString() });
+    store.set(BOARD_KEY, list);
+    return { id, rank: list.filter(x => x.ms < ms).length + 1 };
+  }
+  const res = await fetch(sbBase(), { method: "POST", headers: sbHeaders({ Prefer: "return=representation" }), body: JSON.stringify({ name, ms }) });
+  if(!res.ok) throw new Error(res.status);
+  const [row] = await res.json();
+  // Platz = Anzahl schnellerer Einträge + 1
+  const cnt = await fetch(sbBase() + "?select=id&ms=lt." + ms, { method: "HEAD", headers: sbHeaders({ Prefer: "count=exact" }) });
+  const total = parseInt((cnt.headers.get("content-range") || "*/0").split("/")[1], 10) || 0;
+  return { id: row.id, rank: total + 1 };
+}
+
+/* ---------- Bestenliste anzeigen ---------- */
+let myEntry = null;
+async function renderBoard(){
+  if(lastTime == null){ $("#finalTime").textContent = "–"; $("#saveBtn").disabled = true; $("#studentName").disabled = true;
+    $("#saveMsg").textContent = "Löse zuerst das Kreuzworträtsel, um dich einzutragen."; }
+  let list;
+  try{ list = await fetchBoard(); }
+  catch(e){ $("#emptyBoard").hidden = false; $("#emptyBoard").textContent = "Die Bestenliste ist gerade nicht erreichbar. Prüfe die Internetverbindung."; return; }
+  const tb = $("#board"); tb.innerHTML = "";
+  list.forEach((e, n) => {
+    const tr = document.createElement("tr");
+    if(myEntry != null && String(e.id) === String(myEntry)) tr.className = "me";
+    tr.innerHTML = `<td class="rank">${n+1}</td><td></td><td class="t">${fmt(e.ms)}</td>`;
+    tr.children[1].textContent = e.name;              // Name sicher als Text einsetzen
+    tb.append(tr);
+  });
+  $("#emptyBoard").textContent = "Noch keine Einträge. Sei die oder der Erste!";
+  $("#emptyBoard").hidden = list.length > 0;
+}
+
+$("#nameForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const name = $("#studentName").value.trim().slice(0, 30);
+  if(!name){ $("#saveMsg").textContent = "Bitte gib zuerst deinen Namen ein."; return; }
+  if(lastTime == null) return;
+  $("#saveBtn").disabled = true; $("#saveMsg").textContent = "Wird gespeichert …";
+  try{
+    const r = await addEntry(name, lastTime);
+    myEntry = r.id;
+    solvedState.saved = true; store.set(SOLVED_KEY, solvedState);
+    $("#saveMsg").textContent = `Gespeichert! Du bist auf Platz ${r.rank}.`;
+    $("#studentName").value = ""; $("#studentName").disabled = true;   // nur ein Eintrag pro Lösung
+    renderBoard();
+  }catch(err){
+    $("#saveBtn").disabled = false;
+    $("#saveMsg").textContent = "Speichern hat nicht geklappt. Prüfe die Internetverbindung und versuche es noch einmal.";
+  }
+});
+
+// Löschen geht nur lokal; die Online-Liste wird im Supabase-Dashboard geleert
+if(ONLINE){ $("#clearBoard").hidden = true; }
+else twoStep($("#clearBoard"), "Wirklich löschen?", () => { store.del(BOARD_KEY); myEntry = null; renderBoard(); });
+
+// Online-Liste alle 15 Sekunden aktualisieren, solange die Abschlussseite offen ist
+if(ONLINE) setInterval(() => { if($("#v-abschluss").classList.contains("active")) renderBoard(); }, 15000);
+
+
+/* ---------- Konfetti in Messing, Grün und Ziegelrot ---------- */
+function confetti(){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const cv = $("#confetti"), cx = cv.getContext("2d");
+  cv.width = innerWidth; cv.height = innerHeight;
+  const st = getComputedStyle(document.documentElement);
+  const cols = ["--brass","--ledger","--brick"].map(v => st.getPropertyValue(v).trim());
+  const ps = Array.from({ length: 140 }, () => ({ x: Math.random()*cv.width, y: -20 - Math.random()*cv.height*.5,
+    vx: (Math.random()-.5)*3, vy: 2 + Math.random()*4, s: 5 + Math.random()*6, r: Math.random()*6, c: cols[Math.floor(Math.random()*3)] }));
+  let f = 0;
+  (function tick(){
+    cx.clearRect(0, 0, cv.width, cv.height);
+    ps.forEach(p => { p.x += p.vx; p.y += p.vy; p.r += .1;
+      cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c; cx.fillRect(-p.s/2, -p.s/4, p.s, p.s/2); cx.restore(); });
+    if(++f < 150) requestAnimationFrame(tick); else cx.clearRect(0, 0, cv.width, cv.height);
+  })();
+}
+
+/* Start: Seite aus der Adresse öffnen (z. B. #raetsel) */
+show(location.hash.slice(1) || "charaktere");
+</script>
+</body>
+</html>
